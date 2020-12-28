@@ -5,3 +5,7 @@ body {
     margin-left: 10%;
     margin-top: 10%;
 }
+
+.address_input {
+    width: 700px;
+}
