@@ -1,0 +1,12 @@
+## Check your Internet coverage
+
+### Installation
+1. Clone the repository
+2. `cd check_internet_coverage/`
+3. `pipenv install`
+4. `pipenv shell`
+5. `python manage.py runserver`
+
+
+### Usage
+Go to http://127.0.0.1:8000/.
