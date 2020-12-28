@@ -1,26 +1,47 @@
+from django.http import JsonResponse
 from django.shortcuts import render
 
-
+from coverage_checkers.controllers import CheckerCoverageController
 from coverage_checkers.exceptions import CoverageCheckError
-from coverage_checkers.providers.lowi import LowiChecker
+from ui.forms import AddressForm
 
 ADDRESS = 'Avenida Plutarco, 68, Málaga'
 
 
 def index(request):
-    checker = LowiChecker(ADDRESS)
+    if request.method == 'POST':
+        form = AddressForm(request.POST)
+    else:
+        form = AddressForm()
+
+    if form.is_valid():
+        try:
+            has_coverage = CheckerCoverageController.check_address(form.cleaned_data['address'])
+            return render(request, 'ui/index.html', {
+                'form': form,
+                'status': 'OK',
+                'has_coverage': has_coverage,
+                'message': 'Checked',
+            })
+
+        except CoverageCheckError:
+            return render(request, 'ui/index.html', {
+                'form': form,
+                'status': 'ERROR',
+                'has_coverage': None,
+                'message': 'Something was wrong',
+            })
+
+    return render(request, 'ui/index.html', {'form': form})
+
+
+def check_coverage(request):
+    # TODO: Take address from address
+    address = ADDRESS
+
     try:
-        if checker.has_coverage():
-            message = 'You have coverage in that address :D'
-        else:
-            message = 'You have NOT coverage in that address :('
+        has_coverage = CheckerCoverageController.check_address(address)
+        return JsonResponse({'status': 'OK', 'has_coverage': has_coverage, 'message': 'foo'})
 
-        return render(request, 'ui/index.html', {'message': message})
     except CoverageCheckError:
-        return render(request, 'ui/index.html', {'message': 'Something was wrong'})
-
-    # return HttpResponse(
-    #     content=response.content,
-    #     status=response.status_code,
-    #     content_type=response.headers['Content-Type'],
-    # )
+        return JsonResponse({'status': 'ERROR', 'has_coverage': None, 'message': 'bar'})
