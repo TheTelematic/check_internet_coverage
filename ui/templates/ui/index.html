@@ -22,7 +22,11 @@
     </div>
     <div class="container">
         {% if status == 'OK' %}
-            The result is {{ has_coverage }}.
+            {% if has_coverage %}
+                You have coverage! :D
+            {% else %}
+                You have no coverage! :(
+            {% endif %}
         {% else %}
             {{ message }}
         {% endif %}
